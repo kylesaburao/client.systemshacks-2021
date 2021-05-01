@@ -1,11 +1,9 @@
-<p>
-  <b>{{ username }}</b>
-</p>
-
 <main>
   <div id="rooms">
     <table>
-      <legend>Rooms (current: {{ currentRoom }})</legend>
+      <legend>
+        <b>Rooms (current: {{ currentRoom }})</b>
+      </legend>
       <tbody>
         <tr *ngFor="let room of rooms" (click)="moveRoom(room)">
           <td>{{ room }}</td>
@@ -15,7 +13,9 @@
   </div>
   <div id="users">
     <table>
-      <legend>Users</legend>
+      <legend>
+        <b>Users ({{ username }})</b>
+      </legend>
       <tbody>
         <tr *ngFor="let user of usersOnline">
           <td *ngIf="user.id !== id">{{ user.username }}</td>
@@ -30,7 +30,9 @@
   <div id="messaging">
     <input type="text" #input />
     <button (click)="sendMessage(input.value)">Broadcast</button>
-    <button (click)="sendMessage(input.value, currentRoom)">Broadcast to Room</button>
+    <button (click)="sendMessage(input.value, currentRoom)">
+      Broadcast to Room
+    </button>
 
     <table>
       <tbody>

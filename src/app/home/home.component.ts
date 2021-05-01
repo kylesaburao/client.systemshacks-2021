@@ -27,6 +27,15 @@ export class HomeComponent implements OnInit, OnDestroy {
   // usernameControl: FormGroup;
 
   constructor(private _connection: ServerConnectionService) {
+    const connectSub = this._connection.onConnect().subscribe(() => {
+      this.id = '';
+      this.username = this._connection.getCurrentUsername();
+      this.rooms = [];
+      this.currentRoom = '';
+      this.messages = [];
+      this.usersOnline = [];
+    });
+
     const messageReceiveSub = this._connection
       .getObservableEventStream('client-broadcast-message')
       .subscribe((message) => {
@@ -62,6 +71,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       });
 
     this._subscriptions.push(
+      connectSub,
       messageReceiveSub,
       usernameSub,
       usersSub,

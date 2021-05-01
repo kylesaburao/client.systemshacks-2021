@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { Socket } from 'ngx-socket-io';
 import random from 'random';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 export interface Message {
@@ -36,6 +36,9 @@ type Rooms = string[];
 export class ServerConnectionService {
   static readonly BROADCAST_ID: string = '';
 
+  private _onConnect: Subject<void>;
+  private _onDisconnect: Subject<string>;
+  private _onConnectionError: Subject<string>;
   private _clientID: BehaviorSubject<string>;
   private _peers: BehaviorSubject<ClientIdentity[]>;
   private _peerIDNameMap: { [key: string]: string };
@@ -44,6 +47,9 @@ export class ServerConnectionService {
   private _rooms: BehaviorSubject<string[]>;
 
   constructor(private _socket: Socket) {
+    this._onConnect = new Subject<void>();
+    this._onDisconnect = new Subject<string>();
+    this._onConnectionError = new Subject<string>();
     this._clientID = new BehaviorSubject<string>('');
     this._peers = new BehaviorSubject<ClientIdentity[]>([]);
     this._username = new BehaviorSubject<string>('');
@@ -53,13 +59,33 @@ export class ServerConnectionService {
 
     this._socket.on('connect', () => {
       console.log('Connected to server');
+      this._onConnect.next();
       // this._socket.emit(EVENTS.internal, this._getCurrentTime());
 
       this.fetchAvailableRooms((rooms: string[]) => {
         this._rooms.next(rooms);
       });
 
-      this.updateUsername(`${random.int(0, 100)}`);
+      const persistedUsername: string | null = localStorage.getItem('username');
+
+      if (persistedUsername !== null) {
+        this.updateUsername(persistedUsername);
+      }
+      if (this._username.value === '') {
+        this.updateUsername(`User${random.int(0, 100)}`);
+      } else {
+        this.updateUsername(this._username.value);
+      }
+    });
+
+    this._socket.on('disconnect', (reason: string) => {
+      console.log('Disconnecting:', reason);
+      this._onDisconnect.next(reason);
+    });
+
+    this._socket.on('connect_error', (reason: string) => {
+      console.log('Connection error:', reason);
+      this._onConnectionError.next(reason);
     });
 
     this._socket.fromEvent('rooms-updated').subscribe((event) => {
@@ -121,6 +147,18 @@ export class ServerConnectionService {
     });
   }
 
+  onConnect(): Observable<void> {
+    return this._onConnect.asObservable();
+  }
+
+  onDisconnect(): Observable<string> {
+    return this._onConnectionError.asObservable();
+  }
+
+  onConnectionError(): Observable<string> {
+    return this._onConnectionError.asObservable();
+  }
+
   composeMessage(recipientID: string, text: string, data?: Object): Message {
     let message: Message = {
       recipientID: recipientID,
@@ -136,6 +174,7 @@ export class ServerConnectionService {
   updateUsername(username: string): void {
     this._peerIDNameMap[this._clientID.value] = username;
     this._username.next(username);
+    localStorage.setItem('username', username);
   }
 
   moveToRoom(func: Function, room: string) {
