@@ -1,5 +1,7 @@
 import { NgModule } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatCardModule } from '@angular/material/card';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {
@@ -11,15 +13,14 @@ import { SocketIoConfig, SocketIoModule } from 'ngx-socket-io';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { WEBSOCKET_URL } from './server-values';
-
 const socketConfig: SocketIoConfig = { url: WEBSOCKET_URL, options: {} };
 const RECAPTCHA_SITE_KEY = '6LdKSsIaAAAAAEF658Vl_dtDB3mLhkdguCXkC09a';
 
 @NgModule({
   declarations: [AppComponent, HomeComponent],
   imports: [
+    MatCardModule,
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
