@@ -27,7 +27,7 @@ export interface ClientIdentity {
   id: string;
 }
 
-type Rooms = { [key: string]: string[] };
+type Rooms = string[];
 
 @Injectable({
   providedIn: 'root',
@@ -130,6 +130,10 @@ export class ServerConnectionService {
     this._peerIDNameMap[this._clientID.value] = username;
     this._username.next(username);
     console.log('username 2');
+  }
+
+  getObservableRooms(): Observable<Rooms> {
+    return this._rooms.asObservable();
   }
 
   getCurrentUsername(): string {

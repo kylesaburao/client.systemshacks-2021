@@ -51,13 +51,8 @@ export class HomeComponent implements OnInit, OnDestroy {
       .subscribe((id) => (this.id = id));
 
     const roomListSub = this._connection
-      .getObservableEventStream('rooms-updated')
-      .subscribe(() => {
-        this._connection.fetchAvailableRooms((rooms: string[]) => {
-          this.rooms = rooms;
-        });
-        console.log('rooms updated')
-      });
+      .getObservableRooms()
+      .subscribe((rooms) => (this.rooms = rooms));
 
     this._subscriptions.push(
       messageReceiveSub,
