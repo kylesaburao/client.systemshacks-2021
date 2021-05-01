@@ -11,6 +11,7 @@ export interface Message {
   recipientID: string;
   message: string;
   payload?: Object;
+  isRoomOnly?: boolean;
 }
 
 const EVENTS = {

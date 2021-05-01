@@ -41,8 +41,10 @@
       <table>
         <tbody>
           <tr *ngFor="let messageData of messages">
+              <td *ngIf="messageData.isRoomOnly"><b>ROOM</b></td>
+              <td *ngIf="!messageData.isRoomOnly"><b>GLOBAL</b></td>
             <td>
-              {{ messageData.time }}
+              {{ messageData.time | date: 'h:mm a' }}
             </td>
             <td
               *ngIf="
