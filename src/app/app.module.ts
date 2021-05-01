@@ -8,10 +8,11 @@ import { HomeComponent } from './home/home.component';
 
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 import { WEBSOCKET_URL } from './server-values';
+import { CanvasComponent } from './canvas/canvas.component';
 const socketConfig: SocketIoConfig = { url: WEBSOCKET_URL, options: {} };
 
 @NgModule({
-  declarations: [AppComponent, HomeComponent],
+  declarations: [AppComponent, HomeComponent, CanvasComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,

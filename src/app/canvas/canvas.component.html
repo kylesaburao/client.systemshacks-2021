@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+    <h1> Welcome! </h1>
+    <canvas #canvas width="500" height="250" style="border:1px solid #000000"> </canvas>
+    <script> 
+            var canvas = document.getElementById("canvas"); 
+            var ctx = canvas.getContext("2d"); 
+            canvas.beginPath(); 
+            canvas.arc(200, 100, 50, 0, 2*Math.PI); 
+            canvas.stroke(); 
+    </script> 
+</html>
