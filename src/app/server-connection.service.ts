@@ -58,6 +58,8 @@ export class ServerConnectionService {
       this.fetchAvailableRooms((rooms: string[]) => {
         this._rooms.next(rooms);
       });
+
+      this.updateUsername(`${random.int(0, 100)}`);
     });
 
     this._socket.fromEvent('rooms-updated').subscribe((event) => {
@@ -73,6 +75,7 @@ export class ServerConnectionService {
       if (this._room.value === '?') {
         this._room.next(id);
       }
+      this.moveToRoom(() => {}, id);
     });
 
     this._username.subscribe((username) => {
@@ -116,8 +119,6 @@ export class ServerConnectionService {
       console.log('moving to room ', data.room);
       this._room.next(data.room);
     });
-
-    this.updateUsername(`${random.int(0, 100)}`);
   }
 
   composeMessage(recipientID: string, text: string, data?: Object): Message {
@@ -138,7 +139,17 @@ export class ServerConnectionService {
   }
 
   moveToRoom(func: Function, room: string) {
-    this._socket.emit('move-room', room);
+    // this._socket.emit('move-room', room);
+    this.leaveRoom(this._room.value);
+    this.joinRoom(room);
+  }
+
+  joinRoom(room: string) {
+    this._socket.emit('join-room', room);
+  }
+
+  leaveRoom(room: string) {
+    this._socket.emit('leave-room', room);
   }
 
   getObservableRooms(): Observable<Rooms> {
@@ -200,7 +211,10 @@ export class ServerConnectionService {
 
   sendBroadcastMessage(message: Message, room?: string) {
     this._attachFields(ServerConnectionService.BROADCAST_ID, message);
-    let internal: InternalMessage = this._constructInternalMessage(message, room);
+    let internal: InternalMessage = this._constructInternalMessage(
+      message,
+      room
+    );
     this._socket.emit('client-broadcast-message', internal);
   }
 

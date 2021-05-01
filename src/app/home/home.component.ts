@@ -91,7 +91,6 @@ export class HomeComponent implements OnInit, OnDestroy {
         text
       );
       this._connection.sendBroadcastMessage(message, room);
-      this.messages = [...this.messages, message];
     }
   }
 
