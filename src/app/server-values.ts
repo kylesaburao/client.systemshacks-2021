@@ -1,0 +1,1 @@
+export const WEBSOCKET_URL: string = 'https://hackathon-endpoint.duckdns.org/'
