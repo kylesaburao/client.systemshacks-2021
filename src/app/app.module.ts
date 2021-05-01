@@ -1,13 +1,13 @@
 import { NgModule } from '@angular/core';
+import { FlexLayoutModule } from '@angular/flex-layout';
 import { BrowserModule } from '@angular/platform-browser';
-
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { SocketIoConfig, SocketIoModule } from 'ngx-socket-io';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HomeComponent } from './home/home.component';
-
-import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 import { WEBSOCKET_URL } from './server-values';
+
 const socketConfig: SocketIoConfig = { url: WEBSOCKET_URL, options: {} };
 
 @NgModule({
@@ -17,6 +17,7 @@ const socketConfig: SocketIoConfig = { url: WEBSOCKET_URL, options: {} };
     AppRoutingModule,
     BrowserAnimationsModule,
     SocketIoModule.forRoot(socketConfig),
+    FlexLayoutModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

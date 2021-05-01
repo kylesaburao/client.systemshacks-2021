@@ -1,52 +1,61 @@
 <main>
-  <div id="rooms">
-    <table>
-      <legend>
-        <b>Rooms (current: {{ currentRoom }})</b>
-      </legend>
-      <tbody>
-        <tr *ngFor="let room of rooms" (click)="moveRoom(room)">
-          <td>{{ room }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  <div id="users">
-    <table>
-      <legend>
-        <b>Users ({{ username }})</b>
-      </legend>
-      <tbody>
-        <tr *ngFor="let user of usersOnline">
-          <td *ngIf="user.id !== id">{{ user.username }}</td>
-        </tr>
-      </tbody>
-    </table>
-    <input type="text" #usernameInput />
-    <button (click)="updateUsername(usernameInput.value)">
-      Update username
-    </button>
-  </div>
-  <div id="messaging">
-    <input type="text" #input />
-    <button (click)="sendMessage(input.value)">Broadcast</button>
-    <button (click)="sendMessage(input.value, currentRoom)">
-      Broadcast to Room
-    </button>
+  <div fxLayout="row" fxLayoutAlign="space-evenly stretch">
+    <div fxLayout="column" fxLayoutAlign="start stretch">
+      <div id="rooms">
+        <table>
+          <legend>
+            <b>Rooms (current: {{ currentRoom }})</b>
+          </legend>
+          <tbody>
+            <tr *ngFor="let room of rooms" (click)="moveRoom(room)">
+              <td>{{ room }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div id="users">
+        <table>
+          <legend>
+            <b>Users (current: {{ username }})</b>
+          </legend>
+          <tbody>
+            <tr *ngFor="let user of usersOnline">
+              <td *ngIf="user.id !== id">{{ user.username }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <input type="text" #usernameInput />
+        <button (click)="updateUsername(usernameInput.value)">
+          Update username
+        </button>
+      </div>
+    </div>
+    <div id="messaging">
+      <input type="text" #input />
+      <button (click)="sendMessage(input.value)">Broadcast</button>
+      <button (click)="sendMessage(input.value, currentRoom)">
+        Broadcast to Room
+      </button>
+      <button (click)="messages = []">Clear</button>
 
-    <table>
-      <tbody>
-        <tr *ngFor="let messageData of messages">
-          <td
-            *ngIf="
-              messageData.senderID !== '' && messageData.senderID !== undefined
-            "
-          >
-            {{ getUsername(messageData.senderID) }}:
-          </td>
-          <td>{{ messageData.message }}</td>
-        </tr>
-      </tbody>
-    </table>
+      <table>
+        <tbody>
+          <tr *ngFor="let messageData of messages">
+            <td>
+              {{ messageData.time }}
+            </td>
+            <td
+              *ngIf="
+                messageData.senderID !== '' &&
+                messageData.senderID !== undefined
+              "
+            >
+              {{ getUsername(messageData.senderID) }}:
+            </td>
+            <td>{{ messageData.message }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </main>

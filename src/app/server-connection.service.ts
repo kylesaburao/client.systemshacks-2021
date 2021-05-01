@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { RouterModule } from '@angular/router';
 import { Socket } from 'ngx-socket-io';
 import random from 'random';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
