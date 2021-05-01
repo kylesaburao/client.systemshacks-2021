@@ -1,45 +1,80 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
-import { Socket } from 'ngx-socket-io';
-import random from 'random';
-import { Message, ServerConnectionService } from '../server-connection.service';
+import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { FormGroup } from '@angular/forms';
+import { Subscription } from 'rxjs';
+import {
+  Message,
+  ServerConnectionService,
+  ClientIdentity,
+} from '../server-connection.service';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
+  private _subscriptions: Subscription[] = [];
+
   @ViewChild('input') inputElement?: HTMLInputElement;
-  usersOnline: string[] = [];
+  usersOnline: ClientIdentity[] = [];
   messages: Message[] = [];
+
+  id: string = '';
   username: string = '';
 
+  // usernameControl: FormGroup;
+
   constructor(private _connection: ServerConnectionService) {
-    // this._connection.sendBroadcastMessage({
-    //   recipientID: ServerConnectionService.BROADCAST_ID,
-    //   message: 'hello',
-    // });
-    this._connection
+    const messageReceiveSub = this._connection
       .getObservableEventStream('client-broadcast-message')
       .subscribe((message) => {
         this.messages = [...this.messages, message];
       });
-    // todo subscription delete on ngdestroy
-    this._connection
+
+    const usernameSub = this._connection
       .getObservableUsername()
       .subscribe((username) => (this.username = username));
+
+    const usersSub = this._connection
+      .getObservablePeerIDList()
+      .subscribe((identity) => {
+        this.usersOnline = identity;
+      });
+
+    const connectionIDSub = this._connection
+      .getObservableID()
+      .subscribe((id) => (this.id = id));
+
+    this._subscriptions.push(
+      messageReceiveSub,
+      usernameSub,
+      usersSub,
+      connectionIDSub
+    );
+  }
+
+  ngOnDestroy(): void {
+    this._subscriptions.forEach((sub) => sub.unsubscribe());
   }
 
   ngOnInit(): void {}
 
+  getUsername(clientID: string): string {
+    return this._connection.mapIDToUsername(clientID);
+  }
+
   sendMessage(text: string) {
     if (text) {
-      const message: Message = {
-        message: text,
-        recipientID: ServerConnectionService.BROADCAST_ID,
-      };
+      const message = this._connection.composeMessage(
+        ServerConnectionService.BROADCAST_ID,
+        text
+      );
       this._connection.sendBroadcastMessage(message);
       this.messages = [...this.messages, message];
     }
+  }
+
+  updateUsername(text: string) {
+    this._connection.updateUsername(text);
   }
 }

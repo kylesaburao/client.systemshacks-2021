@@ -4,13 +4,9 @@ import random from 'random';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-interface Peer {
-  username?: string;
-  clientID: string;
-}
-
 export interface Message {
   time?: number;
+  senderUsername?: string;
   senderID?: string;
   recipientID: string;
   message: string;
@@ -25,39 +21,94 @@ interface InternalMessage {
   data: Message;
 }
 
+export interface ClientIdentity {
+  username: string;
+  id: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class ServerConnectionService {
   static readonly BROADCAST_ID: string = '';
 
-  private _clientID: string = '';
-  private _peers: BehaviorSubject<Peer[]>;
+  private _clientID: BehaviorSubject<string>;
+  private _peers: BehaviorSubject<ClientIdentity[]>;
+  private _peerIDNameMap: { [key: string]: string };
   private _username: BehaviorSubject<string>;
 
   constructor(private _socket: Socket) {
-    this._peers = new BehaviorSubject<Peer[]>([]);
-    this._username = new BehaviorSubject<string>(`${random.int(0, 100)}`);
+    this._clientID = new BehaviorSubject<string>('');
+    this._peers = new BehaviorSubject<ClientIdentity[]>([]);
+    this._username = new BehaviorSubject<string>('');
+    this._peerIDNameMap = {};
 
     this._socket.on('connect', () => {
       console.log('Connected to server');
-      this._socket.emit(EVENTS.internal, this._getCurrentTime());
+      // this._socket.emit(EVENTS.internal, this._getCurrentTime());
     });
 
     this._socket.fromEvent('you-are').subscribe((event) => {
-      this._clientID = event as string;
-      console.log(`Updated client ID: ${this._clientID}`);
+      this._clientID.next(event as string);
+      console.log(`Updated client ID: ${this._clientID.value}`);
     });
 
     this._username.subscribe((username) => {
-      this._socket.emit('client-update-username', username);
+      if (username) {
+        this._socket.emit('client-update-username', username);
+      }
     });
 
-    // todo auto update peer list from server
+    this._socket.on('update-single-peer', (peer: ClientIdentity) => {
+      const peerData: ClientIdentity[] = this._peers.value;
+
+      let found: boolean = false;
+      for (let currentPeer of peerData) {
+        if (currentPeer.id === peer.id) {
+          currentPeer.username = peer.username;
+          found = true;
+          break;
+        }
+      }
+
+      if (!found) {
+        peerData.push(peer);
+      }
+
+      this._peerIDNameMap[peer.id] = peer.username;
+      this._peers.next(peerData);
+    });
+
+    this._socket.on('update-all-peers', (peers: ClientIdentity[]) => {
+      console.log('Updating all peers list', peers);
+      this._peers.next(peers);
+
+      this._peerIDNameMap = {};
+      for (let peer of peers) {
+        this._peerIDNameMap[peer.id] = peer.username;
+      }
+    });
+
+    this.updateUsername(`${random.int(0, 100)}`);
+  }
+
+  composeMessage(recipientID: string, text: string, data?: Object): Message {
+    let message: Message = {
+      recipientID: recipientID,
+      message: text,
+      payload: data,
+      senderID: this._clientID.value,
+      senderUsername: this._username.value,
+    };
+    console.log(message);
+    return message;
   }
 
   updateUsername(username: string): void {
+    console.log('username 1', username);
+    this._peerIDNameMap[this._clientID.value] = username;
     this._username.next(username);
+    console.log('username 2');
   }
 
   getCurrentUsername(): string {
@@ -68,7 +119,11 @@ export class ServerConnectionService {
     return this._username.asObservable();
   }
 
-  getObservablePeerIDList(): Observable<Peer[]> {
+  getObservableID(): Observable<string> {
+    return this._clientID.asObservable();
+  }
+
+  getObservablePeerIDList(): Observable<ClientIdentity[]> {
     return this._peers.asObservable();
   }
 
@@ -90,6 +145,15 @@ export class ServerConnectionService {
     this._socket.emit('client-broadcast-message', internal);
   }
 
+  mapIDToUsername(clientID: string): string {
+    let username: string = '';
+    if (clientID in this._peerIDNameMap) {
+      username = this._peerIDNameMap[clientID];
+    }
+    console.log(username, this._peerIDNameMap);
+    return username;
+  }
+
   private _constructInternalMessage(message: Message): InternalMessage {
     let internal: InternalMessage = { data: message };
 
@@ -98,8 +162,9 @@ export class ServerConnectionService {
 
   private _attachFields(recipientID: string, message: Message) {
     message.recipientID = recipientID;
-    message.senderID = this._clientID;
+    message.senderID = this._clientID.value;
     message.time = this._getCurrentTime();
+    message.senderUsername = this.getCurrentUsername();
   }
 
   private _getCurrentTime(): number {

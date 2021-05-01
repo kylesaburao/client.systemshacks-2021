@@ -1,22 +1,28 @@
 <p>
   <b>{{ username }}</b>
 </p>
-<!-- <table>
-    <legend>Users</legend>
-    <tbody>
-        <tr *ngFor="let user of usersOnline">
-            <td *ngIf="user !== id">{{user}}</td>
-        </tr>
-    </tbody>
-</table> -->
+<input type="text" #usernameInput />
+<button (click)="updateUsername(usernameInput.value)">Update username</button>
+<table>
+  <legend>Users</legend>
+  <tbody>
+    <tr *ngFor="let user of usersOnline">
+      <td *ngIf="user.id !== id">{{ user.username }}</td>
+    </tr>
+  </tbody>
+</table>
 <input type="text" #input />
 <button (click)="sendMessage(input.value)">Broadcast</button>
 
 <table>
   <tbody>
     <tr *ngFor="let messageData of messages">
-      <td *ngIf="messageData.senderID !== ''">
-        {{ messageData.senderID }}:
+      <td
+        *ngIf="
+          messageData.senderID !== '' && messageData.senderID !== undefined
+        "
+      >
+        {{ getUsername(messageData.senderID) }}:
       </td>
       <td>{{ messageData.message }}</td>
     </tr>
