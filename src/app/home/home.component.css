@@ -1,0 +1,29 @@
+.room-row:hover {
+  background-color: whitesmoke;
+}
+
+.room-row:active {
+  background-color: gainsboro;
+}
+
+#messages {
+  background-color: gainsboro;
+  width: 100%;
+  /* max-height: 20em; */
+}
+
+#messages > tbody {
+  display: block;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 30em;
+  /* width: 100%; */
+}
+
+#messages > tbody td {
+  white-space: nowrap;
+}
+
+#messages > tbody td:last-child {
+  width: 100%;
+}

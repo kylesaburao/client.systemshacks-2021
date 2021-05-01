@@ -1,4 +1,14 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+  AfterViewChecked,
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  Renderer2,
+  ViewChild,
+  ɵCompiler_compileModuleSync__POST_R3__,
+} from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import {
@@ -12,10 +22,12 @@ import {
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
 })
-export class HomeComponent implements OnInit, OnDestroy {
+export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   private _subscriptions: Subscription[] = [];
 
   @ViewChild('input') inputElement?: HTMLInputElement;
+  @ViewChild('messagesListing') messagesView?: ElementRef;
+
   usersOnline: ClientIdentity[] = [];
   messages: Message[] = [];
 
@@ -26,7 +38,10 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   // usernameControl: FormGroup;
 
-  constructor(private _connection: ServerConnectionService) {
+  constructor(
+    private _connection: ServerConnectionService,
+    private _renderer: Renderer2
+  ) {
     const connectSub = this._connection.onConnect().subscribe(() => {
       this.id = '';
       this.username = this._connection.getCurrentUsername();
@@ -40,6 +55,18 @@ export class HomeComponent implements OnInit, OnDestroy {
       .getObservableEventStream('client-broadcast-message')
       .subscribe((message) => {
         this.messages = [...this.messages, message];
+
+        setTimeout(() => {
+          if (this.messagesView) {
+            const scrollTopBefore = this.messagesView.nativeElement.scrollTop;
+            const newValue = this.messagesView.nativeElement.scrollHeight;
+            this._renderer.setProperty(
+              this.messagesView.nativeElement,
+              'scrollTop',
+              newValue
+            );
+          }
+        }, 0);
       });
 
     const usernameSub = this._connection
@@ -78,6 +105,8 @@ export class HomeComponent implements OnInit, OnDestroy {
       connectionIDSub
     );
   }
+
+  ngAfterViewInit(): void {}
 
   moveRoom(room: string): void {
     console.log('Asking to move to room ', room);

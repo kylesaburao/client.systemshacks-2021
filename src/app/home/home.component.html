@@ -7,7 +7,11 @@
             <b>Rooms (current: {{ currentRoom }})</b>
           </legend>
           <tbody>
-            <tr *ngFor="let room of rooms" (click)="moveRoom(room)">
+            <tr
+              class="room-row"
+              *ngFor="let room of rooms"
+              (click)="moveRoom(room)"
+            >
               <td>{{ room }}</td>
             </tr>
           </tbody>
@@ -38,13 +42,13 @@
       </button>
       <button (click)="messages = []">Clear</button>
 
-      <table>
-        <tbody>
+      <table id="messages">
+        <tbody #messagesListing>
           <tr *ngFor="let messageData of messages">
-              <td *ngIf="messageData.isRoomOnly"><b>ROOM</b></td>
-              <td *ngIf="!messageData.isRoomOnly"><b>GLOBAL</b></td>
+            <td *ngIf="messageData.isRoomOnly"><b>ROOM</b></td>
+            <td *ngIf="!messageData.isRoomOnly"><b>GLOBAL</b></td>
             <td>
-              {{ messageData.time | date: 'h:mm a' }}
+              {{ messageData.time | date: "h:mm a" }}
             </td>
             <td
               *ngIf="
