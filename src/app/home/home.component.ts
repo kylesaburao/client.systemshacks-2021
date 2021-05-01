@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import {
@@ -21,6 +21,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   id: string = '';
   username: string = '';
+  rooms: string[] = [];
 
   // usernameControl: FormGroup;
 
@@ -39,11 +40,24 @@ export class HomeComponent implements OnInit, OnDestroy {
       .getObservablePeerIDList()
       .subscribe((identity) => {
         this.usersOnline = identity;
+
+        this._connection.fetchAvailableRooms((rooms: string[]) => {
+          this.rooms = rooms;
+        });
       });
 
     const connectionIDSub = this._connection
       .getObservableID()
       .subscribe((id) => (this.id = id));
+
+    const roomListSub = this._connection
+      .getObservableEventStream('rooms-updated')
+      .subscribe(() => {
+        this._connection.fetchAvailableRooms((rooms: string[]) => {
+          this.rooms = rooms;
+        });
+        console.log('rooms updated')
+      });
 
     this._subscriptions.push(
       messageReceiveSub,

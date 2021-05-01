@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import { Socket } from 'ngx-socket-io';
 import random from 'random';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -26,6 +27,8 @@ export interface ClientIdentity {
   id: string;
 }
 
+type Rooms = { [key: string]: string[] };
+
 @Injectable({
   providedIn: 'root',
 })
@@ -36,21 +39,39 @@ export class ServerConnectionService {
   private _peers: BehaviorSubject<ClientIdentity[]>;
   private _peerIDNameMap: { [key: string]: string };
   private _username: BehaviorSubject<string>;
+  private _room: BehaviorSubject<string>;
+  private _rooms: BehaviorSubject<string[]>;
 
   constructor(private _socket: Socket) {
     this._clientID = new BehaviorSubject<string>('');
     this._peers = new BehaviorSubject<ClientIdentity[]>([]);
     this._username = new BehaviorSubject<string>('');
+    this._room = new BehaviorSubject<string>('?');
+    this._rooms = new BehaviorSubject<string[]>([]);
     this._peerIDNameMap = {};
 
     this._socket.on('connect', () => {
       console.log('Connected to server');
       // this._socket.emit(EVENTS.internal, this._getCurrentTime());
+
+      this.fetchAvailableRooms((rooms: string[]) => {
+        this._rooms.next(rooms);
+      });
+    });
+
+    this._socket.fromEvent('rooms-updated').subscribe((event) => {
+      const rooms: string[] = event as string[];
+      this._rooms.next(rooms);
     });
 
     this._socket.fromEvent('you-are').subscribe((event) => {
-      this._clientID.next(event as string);
-      console.log(`Updated client ID: ${this._clientID.value}`);
+      const id = event as string;
+      this._clientID.next(id);
+      console.log(`Updated client ID: ${id}`);
+
+      if (this._room.value === '?') {
+        this._room.next(id);
+      }
     });
 
     this._username.subscribe((username) => {
@@ -115,6 +136,10 @@ export class ServerConnectionService {
     return this._username.value;
   }
 
+  getObservableRoom(): Observable<string> {
+    return this._room.asObservable();
+  }
+
   getObservableUsername(): Observable<string> {
     return this._username.asObservable();
   }
@@ -131,6 +156,27 @@ export class ServerConnectionService {
     return (this._socket.fromEvent(event) as Observable<InternalMessage>).pipe(
       map((internal) => internal.data)
     );
+  }
+
+  fetchAvailableRooms(func: Function): void {
+    this._socket.once('available-rooms', (roomList: string[]) => {
+      func(roomList);
+    });
+
+    this._socket.emit('query-available-rooms', 'hi');
+  }
+
+  fetchRoomMembership(
+    func: (membership: { [key: string]: string[] }) => void
+  ): void {
+    this._socket.once(
+      'room-membership',
+      (roomMembership: { [key: string]: string[] }) => {
+        func(roomMembership);
+      }
+    );
+
+    this._socket.emit('query-room-membership', 'hi');
   }
 
   sendTargetedMessage(clientID: string, message: Message) {
