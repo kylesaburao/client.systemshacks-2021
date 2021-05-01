@@ -1,1 +1,16 @@
-<router-outlet></router-outlet>
+<div *ngIf="!captchaResolved; else elseBlock">
+  <div fxLayout="row" fxLayoutAlign="space-around center" style="height: 50vh">
+    <div fxLayout="column" fxLayoutAlign="center center">
+      <h2>No bots allowed</h2>
+      <form [formGroup]="captchaForm">
+        <re-captcha
+          formControlName="recaptcha"
+          (resolved)="recaptchaResolved($event)"
+        ></re-captcha>
+      </form>
+    </div>
+  </div>
+</div>
+<ng-template #elseBlock>
+  <router-outlet></router-outlet>
+</ng-template>

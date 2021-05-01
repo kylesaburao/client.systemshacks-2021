@@ -284,4 +284,11 @@ export class ServerConnectionService {
   private _getCurrentTime(): number {
     return new Date().getTime();
   }
+
+  queryRecaptchaValidator(key: string, callback: Function) {
+    this._socket.once('recaptcha-verify-status', (result: boolean) => {
+      callback(result);
+    });
+    this._socket.emit('verify-recaptcha', key);
+  }
 }
