@@ -5,9 +5,9 @@
 <main>
   <div id="rooms">
     <table>
-      <legend>Rooms</legend>
+      <legend>Rooms (current: {{ currentRoom }})</legend>
       <tbody>
-        <tr *ngFor="let room of rooms">
+        <tr *ngFor="let room of rooms" (click)="moveRoom(room)">
           <td>{{ room }}</td>
         </tr>
       </tbody>
@@ -30,6 +30,7 @@
   <div id="messaging">
     <input type="text" #input />
     <button (click)="sendMessage(input.value)">Broadcast</button>
+    <button (click)="sendMessage(input.value, currentRoom)">Broadcast to Room</button>
 
     <table>
       <tbody>

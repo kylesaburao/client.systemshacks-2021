@@ -22,6 +22,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   id: string = '';
   username: string = '';
   rooms: string[] = [];
+  currentRoom: string = '';
 
   // usernameControl: FormGroup;
 
@@ -54,12 +55,23 @@ export class HomeComponent implements OnInit, OnDestroy {
       .getObservableRooms()
       .subscribe((rooms) => (this.rooms = rooms));
 
+    const currentRoomSub = this._connection
+      .getObservableRoom()
+      .subscribe((room) => {
+        this.currentRoom = room;
+      });
+
     this._subscriptions.push(
       messageReceiveSub,
       usernameSub,
       usersSub,
       connectionIDSub
     );
+  }
+
+  moveRoom(room: string): void {
+    console.log('Asking to move to room ', room);
+    this._connection.moveToRoom(() => {}, room);
   }
 
   ngOnDestroy(): void {
@@ -72,13 +84,13 @@ export class HomeComponent implements OnInit, OnDestroy {
     return this._connection.mapIDToUsername(clientID);
   }
 
-  sendMessage(text: string) {
+  sendMessage(text: string, room?: string) {
     if (text) {
       const message = this._connection.composeMessage(
         ServerConnectionService.BROADCAST_ID,
         text
       );
-      this._connection.sendBroadcastMessage(message);
+      this._connection.sendBroadcastMessage(message, room);
       this.messages = [...this.messages, message];
     }
   }

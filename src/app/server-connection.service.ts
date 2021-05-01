@@ -20,6 +20,7 @@ const EVENTS = {
 
 interface InternalMessage {
   data: Message;
+  room?: string;
 }
 
 export interface ClientIdentity {
@@ -101,13 +102,19 @@ export class ServerConnectionService {
     });
 
     this._socket.on('update-all-peers', (peers: ClientIdentity[]) => {
-      console.log('Updating all peers list', peers);
+      // console.log('Updating all peers list', peers);
       this._peers.next(peers);
 
       this._peerIDNameMap = {};
       for (let peer of peers) {
         this._peerIDNameMap[peer.id] = peer.username;
       }
+    });
+
+    this._socket.on('room-update', (data: { [key: string]: any }) => {
+      console.log(data);
+      console.log('moving to room ', data.room);
+      this._room.next(data.room);
     });
 
     this.updateUsername(`${random.int(0, 100)}`);
@@ -121,15 +128,17 @@ export class ServerConnectionService {
       senderID: this._clientID.value,
       senderUsername: this._username.value,
     };
-    console.log(message);
+    // console.log(message);
     return message;
   }
 
   updateUsername(username: string): void {
-    console.log('username 1', username);
     this._peerIDNameMap[this._clientID.value] = username;
     this._username.next(username);
-    console.log('username 2');
+  }
+
+  moveToRoom(func: Function, room: string) {
+    this._socket.emit('move-room', room);
   }
 
   getObservableRooms(): Observable<Rooms> {
@@ -189,9 +198,9 @@ export class ServerConnectionService {
     this._socket.emit('client-targeted-message', internal);
   }
 
-  sendBroadcastMessage(message: Message) {
+  sendBroadcastMessage(message: Message, room?: string) {
     this._attachFields(ServerConnectionService.BROADCAST_ID, message);
-    let internal: InternalMessage = this._constructInternalMessage(message);
+    let internal: InternalMessage = this._constructInternalMessage(message, room);
     this._socket.emit('client-broadcast-message', internal);
   }
 
@@ -200,12 +209,14 @@ export class ServerConnectionService {
     if (clientID in this._peerIDNameMap) {
       username = this._peerIDNameMap[clientID];
     }
-    console.log(username, this._peerIDNameMap);
     return username;
   }
 
-  private _constructInternalMessage(message: Message): InternalMessage {
-    let internal: InternalMessage = { data: message };
+  private _constructInternalMessage(
+    message: Message,
+    room?: string
+  ): InternalMessage {
+    let internal: InternalMessage = { data: message, room: room };
 
     return internal;
   }
