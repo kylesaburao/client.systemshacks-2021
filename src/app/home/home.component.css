@@ -6,6 +6,10 @@
   width: 40%;
 }
 
+.main-row-container > div:first-of-type {
+  width: 20%;
+}
+
 .room-row:active {
   background-color: gainsboro;
 }
