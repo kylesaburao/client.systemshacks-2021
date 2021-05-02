@@ -4,6 +4,7 @@ import { RecaptchaComponent } from 'ng-recaptcha';
 import { ComponentCommService } from './component-comm.service';
 import { ServerConnectionService } from './server-connection.service';
 import { Howl } from 'howler';
+import { AudioService } from './audio.service';
 
 @Component({
   selector: 'app-root',
@@ -21,7 +22,8 @@ export class AppComponent {
 
   constructor(
     private _connection: ServerConnectionService,
-    private _comm: ComponentCommService
+    private _comm: ComponentCommService,
+    private _audio: AudioService
   ) {
     this.captchaForm = new FormGroup({
       recaptcha: new FormControl(null, Validators.required),
@@ -33,7 +35,6 @@ export class AppComponent {
       console.log(value, 'hi');
       console.log(this.recaptcha);
       if (value && this.recaptcha !== undefined) {
-        console.log('RESET');
         this.recaptcha.reset();
         this.captchaResolved = false;
       }
@@ -45,7 +46,7 @@ export class AppComponent {
       this.captchaResolved = success;
 
       if (success) {
-        new Howl({ src: ['assets/Portal.ogg'] }).play();
+        this._audio.login();
       }
     });
   }

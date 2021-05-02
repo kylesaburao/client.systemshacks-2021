@@ -32,6 +32,10 @@
         <button (click)="updateUsername(usernameInput.value)">
           Update username
         </button>
+
+        <div>
+          <mat-checkbox [checked]="isMuted" (change)="setMute(!($event.checked))">Mute</mat-checkbox>
+        </div>
         <!-- <div style="margin-top: 2em">
           <button (click)="emergencyLogout()" mat-raised-button color="warn">
             EMERGENCY LOCKOUT

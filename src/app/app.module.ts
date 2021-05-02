@@ -16,12 +16,15 @@ import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
 import { WEBSOCKET_URL } from './server-values';
 
+import { MatCheckboxModule } from '@angular/material/checkbox';
+
 const socketConfig: SocketIoConfig = { url: WEBSOCKET_URL, options: {} };
 const RECAPTCHA_SITE_KEY = '6LdKSsIaAAAAAEF658Vl_dtDB3mLhkdguCXkC09a';
 
 @NgModule({
   declarations: [AppComponent, HomeComponent],
   imports: [
+    MatCheckboxModule,
     MatButtonModule,
     MatCardModule,
     BrowserModule,

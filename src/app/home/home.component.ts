@@ -17,7 +17,7 @@ import {
   ServerConnectionService,
   ClientIdentity,
 } from '../server-connection.service';
-import { Howl, Howler } from 'howler';
+import { AudioService } from '../audio.service';
 
 @Component({
   selector: 'app-home',
@@ -38,12 +38,15 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   rooms: string[] = [];
   currentRoom: string = '';
 
+  isMuted: boolean = false;
+
   // usernameControl: FormGroup;
 
   constructor(
     private _connection: ServerConnectionService,
     private _renderer: Renderer2,
-    private _comm: ComponentCommService
+    private _comm: ComponentCommService,
+    private _audio: AudioService
   ) {
     const connectSub = this._connection.onConnect().subscribe(() => {
       this.id = '';
@@ -60,10 +63,9 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
         this.messages = [...this.messages, message];
 
         if (!message.isRoomOnly) {
-          new Howl({ src: ['assets/Cyclist.ogg'] }).play();
-
+          this._audio.message();
         } else {
-          new Howl({ src: ['assets/Magic.ogg'] }).play();
+          this._audio.roomMessage();
         }
 
         setTimeout(() => {
@@ -88,7 +90,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
       .subscribe((identity) => {
         this.usersOnline = identity;
 
-        new Howl({ src: ['assets/Nightlife.ogg'] }).play();
+        this._audio.user();
 
         this._connection.fetchAvailableRooms((rooms: string[]) => {
           this.rooms = rooms;
@@ -109,12 +111,19 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
         this.currentRoom = room;
       });
 
+    const muteSub = this._audio.getEnable().subscribe((enable) => {
+      this.isMuted = !enable;
+    });
+
     this._subscriptions.push(
       connectSub,
       messageReceiveSub,
       usernameSub,
       usersSub,
-      connectionIDSub
+      connectionIDSub,
+      roomListSub,
+      currentRoomSub,
+      muteSub
     );
   }
 
@@ -152,5 +161,9 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   emergencyLogout(): void {
     console.log('Sending logout broadcast');
     this._comm.lockout.next(true);
+  }
+
+  setMute(enable: boolean): void {
+    this._audio.setEnable(enable);
   }
 }
