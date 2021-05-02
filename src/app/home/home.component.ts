@@ -39,6 +39,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   currentRoom: string = '';
 
   usersInCurrentRoom: string[] = [];
+  sendToGlobal: boolean = true;
 
   isMuted: boolean = false;
   muteText: string = '';
@@ -92,9 +93,9 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
       .getObservableUsername()
       .subscribe((username) => (this.username = username));
 
-    this._connection.onRoomMembershipChanged.subscribe(insideRoom => {
+    this._connection.onRoomMembershipChanged.subscribe((insideRoom) => {
       this.usersInCurrentRoom = insideRoom;
-    })
+    });
 
     const usersSub = this._connection
       .getObservablePeerIDList()
@@ -106,7 +107,6 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
         this._connection.fetchAvailableRooms((rooms: string[]) => {
           this.rooms = rooms;
         });
-
       });
 
     const connectionIDSub = this._connection
@@ -156,12 +156,16 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     return this._connection.mapIDToUsername(clientID);
   }
 
-  sendMessage(text: string, room?: string) {
+  sendMessage(text: string) {
     if (text) {
       const message = this._connection.composeMessage(
         ServerConnectionService.BROADCAST_ID,
         text
       );
+      let room: string | undefined = undefined;
+      if (!this.sendToGlobal) {
+        room = this.currentRoom;
+      }
       this._connection.sendBroadcastMessage(message, room);
       this.inputText = '';
     }

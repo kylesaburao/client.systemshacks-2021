@@ -87,13 +87,20 @@
         type="text"
         [(ngModel)]="inputText"
         #input
+        style="width: 100%"
         (keyup.enter)="sendMessage(input.value)"
       />
-      <button (click)="sendMessage(input.value)">Send Message</button>
-      <button (click)="sendMessage(input.value, currentRoom)">
-        Send Message to Room
-      </button>
-      <button (click)="messages = []">Clear</button>
+      <mat-checkbox [(ngModel)]="sendToGlobal">
+        <div *ngIf="sendToGlobal; else sendRoom">Sending to global</div>
+        <ng-template #sendRoom>Sending to room ({{ currentRoom }})</ng-template>
+      </mat-checkbox>
+      <!-- <button (click)="sendMessage(input.value)">Send Message</button> -->
+      <!-- <button (click)="sendMessage(input.value, currentRoom)"> -->
+      <!-- Send Message to Room -->
+      <!-- </button> -->
+      <div>
+        <button (click)="messages = []">Clear</button>
+      </div>
     </div>
   </div>
 </main>
