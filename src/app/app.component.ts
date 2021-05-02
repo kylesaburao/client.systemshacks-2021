@@ -45,7 +45,7 @@ export class AppComponent {
       this.captchaResolved = success;
 
       if (success) {
-        new Howl({ src: ['../../assets/Portal.ogg'] }).play();
+        new Howl({ src: ['assets/Portal.ogg'] }).play();
       }
     });
   }

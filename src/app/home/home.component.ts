@@ -59,7 +59,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
       .subscribe((message) => {
         this.messages = [...this.messages, message];
 
-        new Howl({ src: ['../../assets/Reward.ogg'] }).play();
+        new Howl({ src: ['assets/Reward.ogg'] }).play();
 
         setTimeout(() => {
           if (this.messagesView) {
