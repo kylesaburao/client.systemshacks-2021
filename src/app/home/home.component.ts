@@ -11,6 +11,7 @@ import {
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Subscription } from 'rxjs';
+import { ComponentCommService } from '../component-comm.service';
 import {
   Message,
   ServerConnectionService,
@@ -40,7 +41,8 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
 
   constructor(
     private _connection: ServerConnectionService,
-    private _renderer: Renderer2
+    private _renderer: Renderer2,
+    private _comm: ComponentCommService
   ) {
     const connectSub = this._connection.onConnect().subscribe(() => {
       this.id = '';
@@ -135,5 +137,10 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
 
   updateUsername(text: string) {
     this._connection.updateUsername(text);
+  }
+
+  emergencyLogout(): void {
+    console.log('Sending logout broadcast')
+    this._comm.lockout.next(true);
   }
 }

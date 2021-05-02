@@ -1,5 +1,5 @@
 <main>
-  <div fxLayout="row" fxLayoutAlign="space-evenly stretch">
+  <div class="main-row-container" fxLayout="row" fxLayoutAlign="center stretch">
     <div fxLayout="column" fxLayoutAlign="start stretch">
       <div id="rooms">
         <table>
@@ -32,6 +32,11 @@
         <button (click)="updateUsername(usernameInput.value)">
           Update username
         </button>
+        <!-- <div style="margin-top: 2em">
+          <button (click)="emergencyLogout()" mat-raised-button color="warn">
+            EMERGENCY LOCKOUT
+          </button>
+        </div> -->
       </div>
     </div>
     <div id="messaging">

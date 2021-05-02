@@ -2,6 +2,10 @@
   background-color: whitesmoke;
 }
 
+.main-row-container > div {
+  width: 40%;
+}
+
 .room-row:active {
   background-color: gainsboro;
 }

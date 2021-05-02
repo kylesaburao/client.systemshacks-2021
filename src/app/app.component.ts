@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { RecaptchaComponent } from 'ng-recaptcha';
+import { ComponentCommService } from './component-comm.service';
 import { ServerConnectionService } from './server-connection.service';
 
 @Component({
@@ -11,11 +13,29 @@ export class AppComponent {
   title = 'client-systemhacks';
   captchaResolved: boolean = false;
 
+  @ViewChild('recaptcha', { read: RecaptchaComponent })
+  recaptcha?: RecaptchaComponent;
+
   captchaForm: FormGroup;
 
-  constructor(private _connection: ServerConnectionService) {
+  constructor(
+    private _connection: ServerConnectionService,
+    private _comm: ComponentCommService
+  ) {
     this.captchaForm = new FormGroup({
       recaptcha: new FormControl(null, Validators.required),
+    });
+
+    // this.captchaForm.get('recaptcha').
+
+    this._comm.lockout.subscribe((value) => {
+      console.log(value, 'hi');
+      console.log(this.recaptcha);
+      if (value && this.recaptcha !== undefined) {
+        console.log('RESET');
+        this.recaptcha.reset();
+        this.captchaResolved = false;
+      }
     });
   }
 
