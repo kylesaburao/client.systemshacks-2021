@@ -59,7 +59,12 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
       .subscribe((message) => {
         this.messages = [...this.messages, message];
 
-        new Howl({ src: ['assets/Cyclist.ogg'] }).play();
+        if (!message.isRoomOnly) {
+          new Howl({ src: ['assets/Cyclist.ogg'] }).play();
+
+        } else {
+          new Howl({ src: ['assets/Magic.ogg'] }).play();
+        }
 
         setTimeout(() => {
           if (this.messagesView) {
@@ -84,7 +89,6 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
         this.usersOnline = identity;
 
         new Howl({ src: ['assets/Nightlife.ogg'] }).play();
-
 
         this._connection.fetchAvailableRooms((rooms: string[]) => {
           this.rooms = rooms;
