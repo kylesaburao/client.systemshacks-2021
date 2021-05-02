@@ -40,6 +40,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
 
   isMuted: boolean = false;
   muteText: string = '';
+  inputText: string = '';
 
   // usernameControl: FormGroup;
 
@@ -155,11 +156,14 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
         text
       );
       this._connection.sendBroadcastMessage(message, room);
+      this.inputText = '';
     }
   }
 
   updateUsername(text: string) {
-    this._connection.updateUsername(text);
+    if (text) {
+      this._connection.updateUsername(text);
+    }
   }
 
   emergencyLogout(): void {

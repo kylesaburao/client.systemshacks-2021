@@ -65,7 +65,7 @@
         </tbody>
       </table>
 
-      <input type="text" #input />
+      <input type="text" [(ngModel)]="inputText" #input />
       <button (click)="sendMessage(input.value)">Send Message</button>
       <button (click)="sendMessage(input.value, currentRoom)">
         Send Message to Room
