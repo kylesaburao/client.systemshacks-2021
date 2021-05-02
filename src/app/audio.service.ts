@@ -10,7 +10,11 @@ export class AudioService {
     true
   );
 
+  countdownText: BehaviorSubject<string> = new BehaviorSubject<string>('');
+
   private _countingDown: boolean = false;
+  private _countDown: number = 0;
+  private readonly _maxTime: number = 4000;
 
   constructor() {}
 
@@ -19,12 +23,23 @@ export class AudioService {
 
     if (!state) {
       this.mute();
+
       if (!this._countingDown) {
+        this._countDown = this._maxTime;
         this._countingDown = true;
-        setTimeout(() => {
-          this.setEnable(true);
-          this._countingDown = false;
-        }, 5 * 1000);
+
+        let interval = setInterval(() => {
+          const text = this._countDown <= 0 ? '' : `${this._countDown / 1000}`;
+          this.countdownText.next(text);
+          if (this._countDown <= 0) {
+            clearInterval(interval);
+            this._countDown = 0;
+            this.setEnable(true);
+            this._countingDown = false;
+          } else {
+            this._countDown -= 1000;
+          }
+        }, 1000);
       }
     } else {
       this.unmute();

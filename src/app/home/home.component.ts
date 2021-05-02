@@ -39,6 +39,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   currentRoom: string = '';
 
   isMuted: boolean = false;
+  muteText: string = '';
 
   // usernameControl: FormGroup;
 
@@ -48,6 +49,9 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     private _comm: ComponentCommService,
     private _audio: AudioService
   ) {
+    this._audio.countdownText.subscribe(text => {
+      this.muteText = text;
+    })
     const connectSub = this._connection.onConnect().subscribe(() => {
       this.id = '';
       this.username = this._connection.getCurrentUsername();

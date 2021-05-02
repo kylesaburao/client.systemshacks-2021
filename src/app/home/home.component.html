@@ -34,7 +34,7 @@
         </button>
 
         <div>
-          <mat-checkbox [checked]="isMuted" (change)="setMute(!($event.checked))">Mute</mat-checkbox>
+          <mat-checkbox [checked]="isMuted" (change)="setMute(!($event.checked))">Mute</mat-checkbox> <span style="margin-left: 0.25em">{{muteText}}</span>
         </div>
         <!-- <div style="margin-top: 2em">
           <button (click)="emergencyLogout()" mat-raised-button color="warn">
