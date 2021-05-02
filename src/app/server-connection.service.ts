@@ -120,6 +120,7 @@ export class ServerConnectionService {
     this._socket.on('connect_error', (reason: string) => {
       console.log('Connection error:', reason);
       this._onConnectionError.next(reason);
+      alert('Unable to connect to the server: ' + reason);
     });
 
     this._socket.fromEvent('rooms-updated').subscribe((event) => {
