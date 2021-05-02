@@ -13,7 +13,7 @@ import { AudioService } from './audio.service';
 })
 export class AppComponent {
   title = 'client-systemhacks';
-  captchaResolved: boolean = true;
+  captchaResolved: boolean = false;
 
   @ViewChild('recaptcha', { read: RecaptchaComponent })
   recaptcha?: RecaptchaComponent;
