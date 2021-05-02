@@ -83,6 +83,9 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
       .subscribe((identity) => {
         this.usersOnline = identity;
 
+        new Howl({ src: ['assets/Nightlife.ogg'] }).play();
+
+
         this._connection.fetchAvailableRooms((rooms: string[]) => {
           this.rooms = rooms;
         });
