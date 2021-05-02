@@ -28,13 +28,31 @@
             </tr>
           </tbody>
         </table>
+
+        <table>
+          <legend>
+            <b>Users in room</b>
+          </legend>
+          <tbody>
+            <tr *ngFor="let user of usersInCurrentRoom">
+              <td>{{ getUsername(user) }}</td>
+            </tr>
+          </tbody>
+        </table>
+
         <input type="text" #usernameInput />
         <button (click)="updateUsername(usernameInput.value)">
           Update username
         </button>
 
         <div>
-          <mat-checkbox [disabled]="isMuted" [checked]="isMuted" (change)="setMute(!($event.checked))">Mute</mat-checkbox> <span style="margin-left: 0.25em">{{muteText}}</span>
+          <mat-checkbox
+            [disabled]="isMuted"
+            [checked]="isMuted"
+            (change)="setMute(!$event.checked)"
+            >Mute</mat-checkbox
+          >
+          <span style="margin-left: 0.25em">{{ muteText }}</span>
         </div>
         <!-- <div style="margin-top: 2em">
           <button (click)="emergencyLogout()" mat-raised-button color="warn">

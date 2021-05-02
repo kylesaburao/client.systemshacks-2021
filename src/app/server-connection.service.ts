@@ -46,6 +46,10 @@ export class ServerConnectionService {
   private _room: BehaviorSubject<string>;
   private _rooms: BehaviorSubject<string[]>;
 
+  onRoomMembershipChanged: BehaviorSubject<string[]> = new BehaviorSubject<
+    string[]
+  >([]);
+
   constructor(private _socket: Socket) {
     this._onConnect = new Subject<void>();
     this._onDisconnect = new Subject<string>();
@@ -56,6 +60,17 @@ export class ServerConnectionService {
     this._room = new BehaviorSubject<string>('?');
     this._rooms = new BehaviorSubject<string[]>([]);
     this._peerIDNameMap = {};
+
+    this._socket.on(
+      'room-membership',
+      (membership: { [key: string]: string[] }) => {
+        for (let room in membership) {
+          if (room === this._room.value) {
+            this.onRoomMembershipChanged.next(membership[room]);
+          }
+        }
+      }
+    );
 
     this._socket.on('connect', () => {
       console.log('Connected to server');

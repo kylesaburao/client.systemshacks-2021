@@ -38,6 +38,8 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   rooms: string[] = [];
   currentRoom: string = '';
 
+  usersInCurrentRoom: string[] = [];
+
   isMuted: boolean = false;
   muteText: string = '';
   inputText: string = '';
@@ -50,9 +52,9 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     private _comm: ComponentCommService,
     private _audio: AudioService
   ) {
-    this._audio.countdownText.subscribe(text => {
+    this._audio.countdownText.subscribe((text) => {
       this.muteText = text;
-    })
+    });
     const connectSub = this._connection.onConnect().subscribe(() => {
       this.id = '';
       this.username = this._connection.getCurrentUsername();
@@ -90,6 +92,10 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
       .getObservableUsername()
       .subscribe((username) => (this.username = username));
 
+    this._connection.onRoomMembershipChanged.subscribe(insideRoom => {
+      this.usersInCurrentRoom = insideRoom;
+    })
+
     const usersSub = this._connection
       .getObservablePeerIDList()
       .subscribe((identity) => {
@@ -100,6 +106,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
         this._connection.fetchAvailableRooms((rooms: string[]) => {
           this.rooms = rooms;
         });
+
       });
 
     const connectionIDSub = this._connection
