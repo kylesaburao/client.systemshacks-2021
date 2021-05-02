@@ -73,4 +73,8 @@ export class AudioService {
   unmute(): void {
     new Howl({ src: ['assets/Nightlife.ogg'] }).play();
   }
+
+  alert(): void {
+    new Howl({ src: ['assets/DJ.ogg'] }).play();
+  }
 }

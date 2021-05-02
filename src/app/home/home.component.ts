@@ -127,6 +127,10 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
       this.isMuted = !enable;
     });
 
+    const alertSub = this._connection.onAlert.subscribe(() =>
+      this._audio.alert()
+    );
+
     this._subscriptions.push(
       connectSub,
       messageReceiveSub,
@@ -135,7 +139,8 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
       connectionIDSub,
       roomListSub,
       currentRoomSub,
-      muteSub
+      muteSub,
+      alertSub
     );
   }
 
@@ -211,5 +216,9 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
 
   setMute(enable: boolean): void {
     this._audio.setEnable(enable);
+  }
+
+  alert(): void {
+    this._connection.sendAlert();
   }
 }

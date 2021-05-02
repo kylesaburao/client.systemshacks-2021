@@ -46,9 +46,15 @@ export class ServerConnectionService {
   private _room: BehaviorSubject<string>;
   private _rooms: BehaviorSubject<string[]>;
 
+  onAlert: Subject<void> = new Subject();
+
   onRoomMembershipChanged: BehaviorSubject<string[]> = new BehaviorSubject<
     string[]
   >([]);
+
+  sendAlert(): void {
+    this._socket.emit('ALERT', 'hi');
+  }
 
   constructor(private _socket: Socket) {
     this._onConnect = new Subject<void>();
@@ -60,6 +66,10 @@ export class ServerConnectionService {
     this._room = new BehaviorSubject<string>('?');
     this._rooms = new BehaviorSubject<string[]>([]);
     this._peerIDNameMap = {};
+
+    this._socket.on('ALERT-CLIENT', () => {
+      this.onAlert.next();
+    })
 
     this._socket.on(
       'room-membership',
