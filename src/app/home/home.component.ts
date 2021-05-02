@@ -156,18 +156,45 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     return this._connection.mapIDToUsername(clientID);
   }
 
-  sendMessage(text: string) {
-    if (text) {
-      const message = this._connection.composeMessage(
-        ServerConnectionService.BROADCAST_ID,
-        text
-      );
-      let room: string | undefined = undefined;
-      if (!this.sendToGlobal) {
-        room = this.currentRoom;
+  sendMessage(message: string) {
+    const sendMessage = (text: string, clearInput: boolean) => {
+      if (text) {
+        const message = this._connection.composeMessage(
+          ServerConnectionService.BROADCAST_ID,
+          text
+        );
+        let room: string | undefined = undefined;
+        if (!this.sendToGlobal) {
+          room = this.currentRoom;
+        }
+        this._connection.sendBroadcastMessage(message, room);
+
+        if (clearInput) {
+          this.inputText = '';
+        }
       }
-      this._connection.sendBroadcastMessage(message, room);
-      this.inputText = '';
+    };
+
+    if (message === 'WAKEUP') {
+      let counter = 25;
+
+      let interval = setInterval(() => {
+        if (counter > 0) {
+          let randomMessage: string =
+            Math.random()
+              .toString(16)
+              .replace(/[^a-z]+/g, '') +
+            Math.random()
+              .toString(16)
+              .replace(/[^a-z]+/g, '');
+          sendMessage(randomMessage, counter > 1);
+        } else {
+          clearInterval(interval);
+        }
+        --counter;
+      }, 32);
+    } else {
+      sendMessage(message, true);
     }
   }
 
