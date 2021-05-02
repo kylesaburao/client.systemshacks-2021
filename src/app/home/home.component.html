@@ -83,7 +83,12 @@
         </tbody>
       </table>
 
-      <input type="text" [(ngModel)]="inputText" #input />
+      <input
+        type="text"
+        [(ngModel)]="inputText"
+        #input
+        (keyup.enter)="sendMessage(input.value)"
+      />
       <button (click)="sendMessage(input.value)">Send Message</button>
       <button (click)="sendMessage(input.value, currentRoom)">
         Send Message to Room
