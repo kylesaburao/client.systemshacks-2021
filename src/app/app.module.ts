@@ -15,6 +15,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
 import { WEBSOCKET_URL } from './server-values';
+import { MatInputModule } from '@angular/material/input';
 
 import { MatCheckboxModule } from '@angular/material/checkbox';
 
@@ -24,6 +25,7 @@ const RECAPTCHA_SITE_KEY = '6LdKSsIaAAAAAEF658Vl_dtDB3mLhkdguCXkC09a';
 @NgModule({
   declarations: [AppComponent, HomeComponent],
   imports: [
+    MatInputModule,
     MatCheckboxModule,
     MatButtonModule,
     MatCardModule,
