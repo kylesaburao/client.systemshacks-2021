@@ -53,7 +53,16 @@ export class ServerConnectionService {
   >([]);
 
   sendAlert(): void {
-    this._socket.emit('ALERT', 'hi');
+    let counter: number = 3;
+
+    let interval = setInterval(() => {
+      if (counter <= 0) {
+        clearInterval(interval);
+      } else {
+        this._socket.emit('ALERT', 'hi');
+        --counter;
+      }
+    }, 175);
   }
 
   constructor(private _socket: Socket) {
@@ -69,7 +78,7 @@ export class ServerConnectionService {
 
     this._socket.on('ALERT-CLIENT', () => {
       this.onAlert.next();
-    })
+    });
 
     this._socket.on(
       'room-membership',
