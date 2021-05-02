@@ -40,13 +40,6 @@
       </div>
     </div>
     <div id="messaging">
-      <input type="text" #input />
-      <button (click)="sendMessage(input.value)">Broadcast</button>
-      <button (click)="sendMessage(input.value, currentRoom)">
-        Broadcast to Room
-      </button>
-      <button (click)="messages = []">Clear</button>
-
       <table id="messages">
         <tbody #messagesListing>
           <tr *ngFor="let messageData of messages">
@@ -67,6 +60,13 @@
           </tr>
         </tbody>
       </table>
+
+      <input type="text" #input />
+      <button (click)="sendMessage(input.value)">Broadcast</button>
+      <button (click)="sendMessage(input.value, currentRoom)">
+        Broadcast to Room
+      </button>
+      <button (click)="messages = []">Clear</button>
     </div>
   </div>
 </main>
