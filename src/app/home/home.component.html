@@ -34,7 +34,7 @@
         </button>
 
         <div>
-          <mat-checkbox [checked]="isMuted" (change)="setMute(!($event.checked))">Mute</mat-checkbox> <span style="margin-left: 0.25em">{{muteText}}</span>
+          <mat-checkbox [disabled]="isMuted" [checked]="isMuted" (change)="setMute(!($event.checked))">Mute</mat-checkbox> <span style="margin-left: 0.25em">{{muteText}}</span>
         </div>
         <!-- <div style="margin-top: 2em">
           <button (click)="emergencyLogout()" mat-raised-button color="warn">
@@ -66,9 +66,9 @@
       </table>
 
       <input type="text" #input />
-      <button (click)="sendMessage(input.value)">Broadcast</button>
+      <button (click)="sendMessage(input.value)">Send Message</button>
       <button (click)="sendMessage(input.value, currentRoom)">
-        Broadcast to Room
+        Send Message to Room
       </button>
       <button (click)="messages = []">Clear</button>
     </div>
