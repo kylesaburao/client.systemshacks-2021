@@ -3,6 +3,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { RecaptchaComponent } from 'ng-recaptcha';
 import { ComponentCommService } from './component-comm.service';
 import { ServerConnectionService } from './server-connection.service';
+import { Howl } from 'howler';
 
 @Component({
   selector: 'app-root',
@@ -42,6 +43,10 @@ export class AppComponent {
   recaptchaResolved(event: string) {
     this._connection.queryRecaptchaValidator(event, (success: boolean) => {
       this.captchaResolved = success;
+
+      if (success) {
+        new Howl({ src: ['../../assets/Portal.ogg'] }).play();
+      }
     });
   }
 }

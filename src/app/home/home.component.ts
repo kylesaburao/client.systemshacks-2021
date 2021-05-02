@@ -17,6 +17,7 @@ import {
   ServerConnectionService,
   ClientIdentity,
 } from '../server-connection.service';
+import { Howl, Howler } from 'howler';
 
 @Component({
   selector: 'app-home',
@@ -57,6 +58,8 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
       .getObservableEventStream('client-broadcast-message')
       .subscribe((message) => {
         this.messages = [...this.messages, message];
+
+        new Howl({ src: ['../../assets/Reward.ogg'] }).play();
 
         setTimeout(() => {
           if (this.messagesView) {
@@ -140,7 +143,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   emergencyLogout(): void {
-    console.log('Sending logout broadcast')
+    console.log('Sending logout broadcast');
     this._comm.lockout.next(true);
   }
 }
